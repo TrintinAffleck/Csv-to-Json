@@ -1,3 +1,4 @@
+from multiprocessing.managers import DictProxy
 from sys import argv,exit
 from pandas import read_csv
 from json import loads,dumps
@@ -77,14 +78,18 @@ def main():
 
     for item in get_test_ids_map().items():
         student,test_taken = item
-        student_courses = set()
+        student_courses = {}
+        
         for row in tests_df.itertuples(index=False):
             id,course_id,weight = row
             if id in test_taken:
                 #Add this course to this students course list
-                if students_df.iterrows():
-                    pass
-            
+                try:
+                    if course_id not in student_courses[student]:
+                       student_courses.update({student : [].append(course_id)})
+                except KeyError:
+                    print("exception")
+                    student_courses[student] = []
     nested_dicts = {
         "id" : loaded_student,
         "name" : loaded_student
