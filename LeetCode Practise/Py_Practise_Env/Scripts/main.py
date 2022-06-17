@@ -1,3 +1,4 @@
+from argparse import MetavarTypeHelpFormatter
 from multiprocessing.managers import DictProxy
 from sys import argv,exit
 from pandas import read_csv
@@ -76,26 +77,30 @@ def main():
                 curr_student_values.append(curr_test_id)
         return student_test_id_map
 
-    for item in get_test_ids_map().items():
-        student,test_taken = item
-        student_courses = {}
-        
-        for row in tests_df.itertuples(index=False):
-            id,course_id,weight = row
-            if id in test_taken:
-                #Add this course to this students course list
-                try:
-                    if course_id not in student_courses[student]:
-                       student_courses.update({student : [].append(course_id)})
-                except KeyError:
-                    print("exception")
-                    student_courses[student] = []
     nested_dicts = {
         "id" : loaded_student,
         "name" : loaded_student
         #"loaded_marks" : loaded_marks,
         #"loaded_tests" : loaded_tests
     }
+    for item in get_test_ids_map().items():
+        student,test_taken = item
+        student_courses_map = {}
+        student_courses = set()
+        for row in tests_df.itertuples(index=False):
+            id,course_id,weight = row
+            if id in test_taken:
+                #Add this course to this students course list
+                #TODO see if I can remove the exception but keep the functionality
+                try:
+                    if str(course_id) not in student_courses_map[student]:
+                        student_courses.add(course_id)
+                        student_courses_map.update({student : student_courses})
+
+                except KeyError:
+                    print("exception")
+                    student_courses_map[student] = f'{course_id}'
+                    student_courses.add(course_id)
 
     nested_json = loaded_student
     report = {
