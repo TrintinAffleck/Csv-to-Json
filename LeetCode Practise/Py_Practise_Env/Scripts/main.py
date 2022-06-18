@@ -92,15 +92,17 @@ def main():
             if id in test_taken:
                 #Add this course to this students course list
                 #TODO see if I can remove the exception but keep the functionality
-                try:
-                    if str(course_id) not in student_courses_map[student]:
-                        student_courses.add(course_id)
-                        student_courses_map.update({student : student_courses})
-
-                except KeyError:
-                    print("exception")
+                if len(student_courses_map) == 0:
                     student_courses_map[student] = f'{course_id}'
                     student_courses.add(course_id)
+                else:
+                    try:
+                        if str(course_id) not in student_courses_map[student]:
+                            student_courses.add(course_id)
+                            student_courses_map.update({student : student_courses})
+                    except KeyError:
+                        student_courses_map[student] = f'{course_id}'
+                        student_courses.add(course_id)
 
     nested_json = loaded_student
     report = {
