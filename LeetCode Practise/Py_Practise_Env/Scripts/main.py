@@ -1,5 +1,3 @@
-from argparse import MetavarTypeHelpFormatter
-from multiprocessing.managers import DictProxy
 from sys import argv,exit
 from pandas import read_csv
 from json import loads,dumps
@@ -86,16 +84,19 @@ def main():
     for item in get_test_ids_map().items():
         student,test_taken = item
         student_courses_map = {}
-        student_courses = set()
+        student_courses = []
         for row in tests_df.itertuples(index=False):
             id,course_id,weight = row
             if id in test_taken:
                 #Add this course to this students course list
                 if str(course_id) not in student_courses_map.get(student,[]):
-                        student_courses.add(course_id)
+                    if course_id not in student_courses:
+                        student_courses.append(course_id)
                         student_courses_map.update({student : student_courses})
-    for i in range(len(loaded_student)):
-        loaded_student[i].update({'totalAverage' : 0, 'courses' : []})
+        #Adding totalAverage and courses keys into json
+        for i in range(len(loaded_student)):
+            loaded_student[i].update({'totalAverage' : 0, 'courses' : student_courses})
+
 
     report = {
         "students" : loaded_student,
