@@ -79,9 +79,9 @@ def main():
 
     nested_dicts = {
         "id" : loaded_student,
-        "name" : loaded_student
-        #"loaded_marks" : loaded_marks,
-        #"loaded_tests" : loaded_tests
+        "name" : loaded_student,
+        "totalAverage" : 0,
+        "courses" : [loaded_courses]
     }
     for item in get_test_ids_map().items():
         student,test_taken = item
@@ -91,22 +91,14 @@ def main():
             id,course_id,weight = row
             if id in test_taken:
                 #Add this course to this students course list
-                #TODO see if I can remove the exception but keep the functionality
-                if len(student_courses_map) == 0:
-                    student_courses_map[student] = f'{course_id}'
-                    student_courses.add(course_id)
-                else:
-                    try:
-                        if str(course_id) not in student_courses_map[student]:
-                            student_courses.add(course_id)
-                            student_courses_map.update({student : student_courses})
-                    except KeyError:
-                        student_courses_map[student] = f'{course_id}'
+                if str(course_id) not in student_courses_map.get(student,[]):
                         student_courses.add(course_id)
+                        student_courses_map.update({student : student_courses})
+    for i in range(len(loaded_student)):
+        loaded_student[i].update({'totalAverage' : 0, 'courses' : []})
 
-    nested_json = loaded_student
     report = {
-        "students" : nested_json,
+        "students" : loaded_student,
         "error" : "Invalid course weights"
     }
 
