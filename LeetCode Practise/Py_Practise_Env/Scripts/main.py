@@ -94,8 +94,8 @@ def main():
                         student_courses.append(course_id)
                         student_courses_map.update({student : student_courses})
         #Adding totalAverage and courses keys into json
-        for i in range(len(loaded_student)):
-            loaded_student[i].update({'totalAverage' : 0, 'courses' : student_courses})
+        loaded_student[int(student)-1].update({'totalAverage' : 0, 
+        'courses' : student_courses_map.get(student,"")})
 
 
     report = {
