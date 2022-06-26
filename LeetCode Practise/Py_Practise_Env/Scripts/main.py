@@ -1,4 +1,5 @@
 from sys import argv,exit
+from webbrowser import get
 from pandas import read_csv
 from json import loads,dumps
 from glob import glob;
@@ -49,12 +50,12 @@ def main():
     loaded_marks = loads(marks_json)
     loaded_tests = loads(tests_json)
 
-    student_test_id_map = {}
     def get_test_ids_map(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
         tests they took. ``E.g:`` if the student with a student id of '1' took tests with test ids 1,1,2,3
         the value is [1,2,3]'''
+        student_test_id_map = {}
         seen_student_ids = set()
         curr_student_values = []
         for i,row in marks_df.iterrows():
@@ -81,26 +82,31 @@ def main():
         "totalAverage" : 0,
         "courses" : [loaded_courses]
     }
-    for item in get_test_ids_map().items():
-        student,test_taken = item
-        student_courses_map = {}
-        student_courses = []
-        for row in tests_df.itertuples(index=False):
-            id,course_id,weight = row
-            if id in test_taken:
-                #Add this course to this students course list
-                if str(course_id) not in student_courses_map.get(student,[]):
-                    if course_id not in student_courses:
-                        student_courses.append(course_id)
-                        student_courses_map.update({student : student_courses})
-        #Adding totalAverage and courses keys into json
-        loaded_student[int(student)-1].update({'totalAverage' : 0, 
-        'courses' : student_courses_map.get(student,"")})
-
+    def  get_courses():
+        for item in get_test_ids_map().items():
+            student,test_taken = item
+            student_courses_map = {}
+            student_courses = []
+            for row in tests_df.itertuples(index=False):
+                id,course_id,weight = row
+                if id in test_taken:
+                    #Add this course to this students course list
+                    if str(course_id) not in student_courses_map.get(student,[]):
+                        if course_id not in student_courses:
+                            student_courses.append(course_id)
+                            student_courses_map.update({student : student_courses})
+            #Adding totalAverage and courses keys into json
+            curr_course = loaded_courses[int(student)-1]
+            curr_student = loaded_student[int(student)-1]
+            # curr_course[curr_student.get(f'{int(student)}','Invalid Student')] = student
+            #for i in range(len(student_courses)):
+            if curr_course['id'] in student_courses:
+                curr_student.update({'totalAverage' : 0,'courses' : [curr_course]})
+    get_courses()
 
     report = {
-        "students" : loaded_student,
-        "error" : "Invalid course weights"
+        'students' : loaded_student,
+        'error' : 'Invalid course weights'
     }
 
     dumped = dumps(report,indent=2)
