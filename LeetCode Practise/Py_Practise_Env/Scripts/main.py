@@ -69,7 +69,7 @@ def main():
             else:
                 print("Your row or column is empty! Check your data in marks csv student id column.")
                 exit(0)
-            #Reset the map if we see a new student 
+            #Reset the map if we see a new student
             if curr_student not in seen_student_ids:
                 curr_student_values = []
                 seen_student_ids.add(curr_student)
@@ -77,10 +77,11 @@ def main():
             if curr_test_id not in curr_student_values:
                 curr_student_values.append(curr_test_id)
         return student_test_id_map
+
     def get_courses():
-        index = -1
+        item_index = -1
         for item in get_test_ids_map().items():
-            index += 1
+            item_index += 1
             student,test_taken = item
             student_courses_map = {}
             student_courses = []
@@ -93,12 +94,13 @@ def main():
                             student_courses.append(course_id)
                             student_courses_map.update({student : student_courses})
             #Adding totalAverage and courses keys into json
-            curr_course = loaded_courses[int(student)-1]
-            curr_student = loaded_student[int(student)-1]
+            curr_student = loaded_student[item_index]
             courses = []
             for i in range(len(student_courses)):
-                if loaded_courses[index]['id'] == student_courses[i]:
-                    loaded_student[index].update({'totalAverage' : 0,'courses' : courses.append(loaded_courses[int(student)-1])})
+                curr_course = loaded_courses[item_index]
+                if curr_course['id'] == student_courses[i]:
+                    courses.append(curr_course)
+                    loaded_student[item_index].update({'totalAverage' : 0,'courses' : courses})
     get_courses()
 
     report = {
