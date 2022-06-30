@@ -68,7 +68,7 @@ def main():
                 student_test_id_map.update({f"{curr_student}": curr_student_values})
             else:
                 print("Your row or column is empty! Check your data in marks csv student id column.")
-                #TODO Exit program here or create a while loop
+                exit(0)
             #Reset the map if we see a new student 
             if curr_student not in seen_student_ids:
                 curr_student_values = []
@@ -78,9 +78,9 @@ def main():
                 curr_student_values.append(curr_test_id)
         return student_test_id_map
     def get_courses():
-        student_index = -1
+        index = -1
         for item in get_test_ids_map().items():
-            student_index += 1
+            index += 1
             student,test_taken = item
             student_courses_map = {}
             student_courses = []
@@ -97,8 +97,8 @@ def main():
             curr_student = loaded_student[int(student)-1]
             courses = []
             for i in range(len(student_courses)):
-                if loaded_courses[student_index]['id'] == student_courses[i]:
-                    loaded_student[student_index].update({'totalAverage' : 0,'courses' : courses.append(loaded_courses[int(student)-1])})
+                if loaded_courses[index]['id'] == student_courses[i]:
+                    loaded_student[index].update({'totalAverage' : 0,'courses' : courses.append(loaded_courses[int(student)-1])})
     get_courses()
 
     report = {
