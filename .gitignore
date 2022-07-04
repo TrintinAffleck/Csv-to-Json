@@ -128,39 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/._Example1
-LeetCode Practise/Py_Practise_Env/Scripts/diffBetweenEvents.py
-LeetCode Practise/Py_Practise_Env/Scripts/easy_install-3.9.exe
-LeetCode Practise/Py_Practise_Env/pyvenv.cfg
-LeetCode Practise/Py_Practise_Env/Scripts/activate
-LeetCode Practise/Py_Practise_Env/Scripts/activate.bat
-LeetCode Practise/Py_Practise_Env/Scripts/Activate.ps1
-LeetCode Practise/Py_Practise_Env/Scripts/arg-output.py
-LeetCode Practise/Py_Practise_Env/Scripts/cap_test.py
-LeetCode Practise/Py_Practise_Env/Scripts/cap.py
-LeetCode Practise/Py_Practise_Env/Scripts/deactivate.bat
-LeetCode Practise/Py_Practise_Env/Scripts/easy_install.exe
-LeetCode Practise/Py_Practise_Env/Scripts/f2py.exe
-LeetCode Practise/Py_Practise_Env/Scripts/get_objgraph
-LeetCode Practise/Py_Practise_Env/Scripts/isort-identify-imports.exe
-LeetCode Practise/Py_Practise_Env/Scripts/isort.exe
-LeetCode Practise/Py_Practise_Env/Scripts/pip.exe
-LeetCode Practise/Py_Practise_Env/Scripts/pip3.9.exe
-LeetCode Practise/Py_Practise_Env/Scripts/pip3.exe
-LeetCode Practise/Py_Practise_Env/Scripts/Python Practise.py
-LeetCode Practise/Py_Practise_Env/Scripts/Python_Testing.py
-LeetCode Practise/Py_Practise_Env/Scripts/python.exe
-LeetCode Practise/Py_Practise_Env/Scripts/pythonw.exe
-LeetCode Practise/Py_Practise_Env/Scripts/undill
-LeetCode Practise/Py_Practise_Env/Scripts/.vscode/launch.json
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/Example1/._courses.csv
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/Example1/._marks.csv
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/Example1/._output.json
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/Example1/._students.csv
-LeetCode Practise/Py_Practise_Env/Scripts/__MACOSX/Example1/._tests.csv
-LeetCode Practise/Py_Practise_Env/Scripts/Example1/courses.csv
-LeetCode Practise/Py_Practise_Env/Scripts/Example1/marks.csv
-LeetCode Practise/Py_Practise_Env/Scripts/Example1/output.json
-LeetCode Practise/Py_Practise_Env/Scripts/Example1/students.csv
-LeetCode Practise/Py_Practise_Env/Scripts/Example1/tests.csv
 .vscode/launch.json
