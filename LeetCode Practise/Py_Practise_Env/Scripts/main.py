@@ -1,6 +1,4 @@
-from collections import Counter
 from sys import argv,exit
-from webbrowser import get
 from pandas import read_csv
 from json import loads,dumps
 from glob import glob;
@@ -16,6 +14,7 @@ def main():
         output_path = argument_list[4]
     else:
         print(f"Arguements given: {len(argument_list)} Expected 5")
+        
 
     #Find files csv files in directory
     file_ext = ".csv"
