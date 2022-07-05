@@ -76,10 +76,8 @@ def main():
                 curr_student_values.append(curr_test_id)
         return student_test_id_map
 
-    def get_courses():
-        item_index = -1
+    def get_courses(item_index: int = 0, course_index: int = 0):
         for item in get_test_ids_map().items():
-            item_index += 1
             student,test_taken = item
             student_courses_map = {}
             student_courses = []
@@ -94,11 +92,16 @@ def main():
             #Adding totalAverage and courses keys into json
             curr_student = loaded_student[item_index]
             courses = []
-            for i in range(len(student_courses)):
-                curr_course = loaded_courses[item_index]
-                if curr_course['id'] == student_courses[i]:
-                    courses.append(curr_course)
-                    loaded_student[item_index].update({'totalAverage' : 0,'courses' : courses})
+
+            for i in range(len(loaded_courses)):
+                if loaded_courses[i]['id'] in student_courses:
+                    courses.append(loaded_courses[i])
+                    curr_student.update({'totalAverage' : 0,'courses' : courses})
+                    course_index+=1
+                else:
+                    course_index+=1
+            item_index+=1
+            course_index=0
     get_courses()
 
     report = {
@@ -107,8 +110,8 @@ def main():
     }
 
     dumped = dumps(report,indent=2)
-    # print(dumped)
-    f = open('test.txt','w')
+    #print(dumped)
+    f = open('output.txt','w')
     f.write(dumped)
     f.close()
 
