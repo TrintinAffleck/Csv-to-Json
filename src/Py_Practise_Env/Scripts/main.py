@@ -1,3 +1,4 @@
+from cgi import test
 from sys import argv,exit
 from pandas import read_csv
 from json import loads,dumps
@@ -28,7 +29,7 @@ def main():
         tests_df = read_csv(tests_path, engine='python',header=0,
         usecols=['id','course_id','weight'])
         marks_df = read_csv(marks_path, engine='python',header=0,
-        usecols=['test_id','student_ids','mark'])
+        usecols=['test_id','student_id','mark'])
     except ValueError:
         print("You have entered the wrong column names or order.")
         print(f"The columns we expected for the courses csv are {['id','name','teacher']}")
@@ -76,33 +77,39 @@ def main():
                 curr_student_values.append(curr_test_id)
         return student_test_id_map
 
-    def get_courses(item_index: int = 0, course_index: int = 0):
+
+    def get_course_avg(tests : list):
+    #Loop marks.df
+        for mark in marks_df.iterrows():
+            print(mark)
+    #If test id in tests take for curr student
+
+        #add the marks for that test to current student marks list
+        #find avg
+        #update dict
+        pass
+    def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
         for item in get_test_ids_map().items():
             student,test_taken = item
-            student_courses_map = {}
-            student_courses = []
+            tests_list = []
             for row in tests_df.itertuples(index=False):
-                id,course_id,weight = row
-                if id in test_taken:
-                    #Add this course to this students course list
-                    if str(course_id) not in student_courses_map.get(student,[]):
-                        if course_id not in student_courses:
-                            student_courses.append(course_id)
-                            student_courses_map.update({student : student_courses})
-            #Adding totalAverage and courses keys into json
+                test_id,course_id,weight = row
+                if test_id in test_taken:
+                    if course_id not in tests_list:
+                        tests_list.append(course_id)
+            get_course_avg(tests_list)
+
             curr_student = loaded_student[item_index]
             courses = []
-
+            #Adding totalAverage and courses keys into json
             for i in range(len(loaded_courses)):
-                if loaded_courses[i]['id'] in student_courses:
+                if loaded_courses[i]['id'] in tests_list:
                     courses.append(loaded_courses[i])
                     curr_student.update({'totalAverage' : 0,'courses' : courses})
-                    course_index+=1
-                else:
-                    course_index+=1
+                course_index+=1
             item_index+=1
             course_index=0
-    get_courses()
+    get_courses_and_tests()
 
     report = {
         'students' : loaded_student,

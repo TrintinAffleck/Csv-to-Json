@@ -165,3 +165,5 @@ src/Py_Practise_Env/Scripts/Example1/marks.csv
 src/Py_Practise_Env/Scripts/Example1/output.json
 src/Py_Practise_Env/Scripts/Example1/students.csv
 src/Py_Practise_Env/Scripts/Example1/tests.csv
+Csv-to-Json.code-workspace
+.gitignore
