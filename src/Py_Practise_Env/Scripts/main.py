@@ -31,12 +31,11 @@ def main():
         marks_df = read_csv(marks_path, engine='python',header=0,
         usecols=['test_id','student_id','mark'])
     except ValueError:
-        print("You have entered the wrong column names or order.")
+        print("You have either entered the wrong column names or order.")
         print(f"The columns we expected for the courses csv are {['id','name','teacher']}")
         print(f"The columns we expected for the students csv are {['id','name']}")
         print(f"The columns we expected for the tests csv are {['id','course_id','weight']}")
-        print(f"The columns we expected for the marks csv are {['test_id','student_ids','mark']}")
-        
+        print(f"The columns we expected for the marks csv are {['test_id','student_ids','mark']}")  
     else:
         print("Csv's successfully read.")
 
@@ -58,36 +57,22 @@ def main():
         student_test_id_map = {}
         seen_student_ids = set()
         curr_student_values = []
-        for i,row in marks_df.iterrows():
-            #Init Current Student & Test Id
-            curr_student = row[marks_df.columns[1]] #Student Id column
-            curr_test_id = row[marks_df.columns[0]] #Test id column
-            #Updating my map with them
-            if curr_student:
-                student_test_id_map.update({f"{curr_student}": curr_student_values})
-            else:
-                print("Your row or column is empty! Check your data in marks csv student id column.")
-                exit(0)
+        marks = []
+        for row in marks_df.itertuples():
+            #add the marks for that test to current student marks list
+            #find avg
+            #update dict
+            test_id,curr_student,mark = row
+            student_test_id_map.update({f"{curr_student}": curr_student_values})
             #Reset the map if we see a new student
             if curr_student not in seen_student_ids:
-                curr_student_values = []
+                curr_student_values.clear()
+                marks.clear()
                 seen_student_ids.add(curr_student)
             #If test_id isnt in our list already add it
-            if curr_test_id not in curr_student_values:
-                curr_student_values.append(curr_test_id)
+            if test_id not in curr_student_values:
+                curr_student_values.append(test_id)
         return student_test_id_map
-
-
-    def get_course_avg(tests : list):
-    #Loop marks.df
-        for mark in marks_df.iterrows():
-            print(mark)
-    #If test id in tests take for curr student
-
-        #add the marks for that test to current student marks list
-        #find avg
-        #update dict
-        pass
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
         for item in get_test_ids_map().items():
             student,test_taken = item
