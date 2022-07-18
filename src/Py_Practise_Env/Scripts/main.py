@@ -58,21 +58,25 @@ def main():
         seen_student_ids = set()
         curr_student_values = []
         marks = []
-        for row in marks_df.itertuples():
-            #add the marks for that test to current student marks list
+        for row in marks_df.itertuples(index=False):
             #find avg
             #update dict
             test_id,curr_student,mark = row
             student_test_id_map.update({f"{curr_student}": curr_student_values})
             #Reset the map if we see a new student
             if curr_student not in seen_student_ids:
-                curr_student_values.clear()
-                marks.clear()
+                curr_student_values = []
+                marks = []
                 seen_student_ids.add(curr_student)
+            if len(marks) > 0:
+                average_mark = (sum(marks) / len(marks))
+            marks.append(mark)
             #If test_id isnt in our list already add it
             if test_id not in curr_student_values:
                 curr_student_values.append(test_id)
         return student_test_id_map
+
+    #TODO Maybe refactor this too    
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
         for item in get_test_ids_map().items():
             student,test_taken = item
@@ -82,7 +86,6 @@ def main():
                 if test_id in test_taken:
                     if course_id not in tests_list:
                         tests_list.append(course_id)
-            get_course_avg(tests_list)
 
             curr_student = loaded_student[item_index]
             courses = []
