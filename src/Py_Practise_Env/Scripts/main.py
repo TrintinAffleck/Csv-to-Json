@@ -1,8 +1,8 @@
-from cgi import test
 from sys import argv,exit
 from pandas import read_csv
 from json import loads,dumps
-from glob import glob;
+from glob import glob
+
 def main():
     '''Setting up CLI'''
     argument_list = argv[1:]
@@ -49,18 +49,17 @@ def main():
     loaded_marks = loads(marks_json)
     loaded_tests = loads(tests_json)
 
-    def get_test_ids_map(): 
+    student_test_id_map = {}
+    student_marks = {}
+    seen_student_ids = set()
+    marks = []
+    def create_dict(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
         tests they took. ``E.g:`` if the student with a student id of '1' took tests with test ids 1,1,2,3
         the value is [1,2,3]'''
-        student_test_id_map = {}
-        seen_student_ids = set()
-        curr_student_values = []
-        marks = []
         for row in marks_df.itertuples(index=False):
-            #find avg
-            #update dict
+            curr_student_values = []
             test_id,curr_student,mark = row
             student_test_id_map.update({f"{curr_student}": curr_student_values})
             #Reset the map if we see a new student
@@ -70,7 +69,8 @@ def main():
                 seen_student_ids.add(curr_student)
             if len(marks) > 0:
                 average_mark = (sum(marks) / len(marks))
-            marks.append(mark)
+                marks.append(mark)
+                student_marks.update({f"{curr_student}": average_mark})
             #If test_id isnt in our list already add it
             if test_id not in curr_student_values:
                 curr_student_values.append(test_id)
@@ -78,7 +78,7 @@ def main():
 
     #TODO Maybe refactor this too    
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
-        for item in get_test_ids_map().items():
+        for item in create_dict().items():
             student,test_taken = item
             tests_list = []
             for row in tests_df.itertuples(index=False):
@@ -91,6 +91,7 @@ def main():
             courses = []
             #Adding totalAverage and courses keys into json
             for i in range(len(loaded_courses)):
+                loaded_courses[i]['courseAverage' : ]
                 if loaded_courses[i]['id'] in tests_list:
                     courses.append(loaded_courses[i])
                     curr_student.update({'totalAverage' : 0,'courses' : courses})
