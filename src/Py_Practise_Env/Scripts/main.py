@@ -8,27 +8,28 @@ from convert import Json
 def main():
     student_test_id_map = {}
     student_marks = {}
-    seen_student_ids = set()
     def create_dict(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
         tests they took. ``E.g:`` if the student with a student id of '1' took tests with test ids 1,1,2,3
         the value is [1,2,3]'''
+        seen_student_ids = set()
+        marks = []
+        values = []
         for row in Data.marks_df.itertuples(index=False):
-            values = []
-            marks = []
             test_id,curr_student,mark = row
             student_test_id_map.update({f"{curr_student}": values})
-            #Reset the map if we see a new student
+            #Clear our lists because we dont want a previous students tests to overlap with the current students tests.
             if curr_student not in seen_student_ids:
                 values.clear()
                 marks.clear()
                 seen_student_ids.add(curr_student)
+            #Create Marks list to keep track of student marks.
             marks.append(mark)
             if len(marks) > 0:
                 average_mark = (sum(marks) / len(marks))
                 student_marks.update({f"{curr_student}": average_mark})
-            #If test_id isnt in our list already add it
+            #We need a list of test_ids for the dictionary.
             if test_id not in values:
                 values.append(test_id)
         return student_test_id_map
