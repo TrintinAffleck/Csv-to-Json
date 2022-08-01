@@ -1,79 +1,36 @@
-from sys import argv,exit
-from pandas import read_csv
+#Built-Ins
 from json import loads,dumps
-from glob import glob
 
+#Locals
+from command_inputs import Commands as paths
+from data import Data
+from convert import Json
 def main():
-    '''Setting up CLI'''
-    argument_list = argv[1:]
-    if len(argument_list) == 5:
-        course_path = argument_list[0]
-        students_path = argument_list[1]
-        tests_path = argument_list[2]
-        marks_path = argument_list[3]
-        output_path = argument_list[4]
-    else:
-        print(f"Arguements given: {len(argument_list)} Expected 5")
-        exit(0)
-
-    #Find files csv files in directory
-    file_ext = ".csv"
-    all_files = [i for i in glob(f"*{file_ext}")]
-
-    #Creating Dataframes
-    try:
-        courses_df = read_csv(course_path, engine='python',header=0,
-        usecols=['id','name','teacher'])
-        students_df = read_csv(students_path, engine='python',header=0,
-        usecols=['id','name'])
-        tests_df = read_csv(tests_path, engine='python',header=0,
-        usecols=['id','course_id','weight'])
-        marks_df = read_csv(marks_path, engine='python',header=0,
-        usecols=['test_id','student_id','mark'])
-    except ValueError:
-        print("You have either entered the wrong column names or order.")
-        print(f"The columns we expected for the courses csv are {['id','name','teacher']}")
-        print(f"The columns we expected for the students csv are {['id','name']}")
-        print(f"The columns we expected for the tests csv are {['id','course_id','weight']}")
-        print(f"The columns we expected for the marks csv are {['test_id','student_ids','mark']}")  
-    else:
-        print("Csv's successfully read.")
-
-    #Putting them into json format
-    student_json = students_df.to_json(orient='records',indent=2)
-    course_json = courses_df.to_json(orient='records',indent=2)
-    marks_json = marks_df.to_json(orient='records',indent=2)
-    tests_json = tests_df.to_json(orient='records',indent=2)
-    loaded_student = loads(student_json)
-    loaded_courses = loads(course_json)
-    loaded_marks = loads(marks_json)
-    loaded_tests = loads(tests_json)
-
     student_test_id_map = {}
     student_marks = {}
     seen_student_ids = set()
-    marks = []
     def create_dict(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
         tests they took. ``E.g:`` if the student with a student id of '1' took tests with test ids 1,1,2,3
         the value is [1,2,3]'''
-        for row in marks_df.itertuples(index=False):
-            curr_student_values = []
+        for row in Data.marks_df.itertuples(index=False):
+            values = []
+            marks = []
             test_id,curr_student,mark = row
-            student_test_id_map.update({f"{curr_student}": curr_student_values})
+            student_test_id_map.update({f"{curr_student}": values})
             #Reset the map if we see a new student
             if curr_student not in seen_student_ids:
-                curr_student_values = []
-                marks = []
+                values.clear()
+                marks.clear()
                 seen_student_ids.add(curr_student)
+            marks.append(mark)
             if len(marks) > 0:
                 average_mark = (sum(marks) / len(marks))
-                marks.append(mark)
                 student_marks.update({f"{curr_student}": average_mark})
             #If test_id isnt in our list already add it
-            if test_id not in curr_student_values:
-                curr_student_values.append(test_id)
+            if test_id not in values:
+                values.append(test_id)
         return student_test_id_map
 
     #TODO Maybe refactor this too    
@@ -81,19 +38,18 @@ def main():
         for item in create_dict().items():
             student,test_taken = item
             tests_list = []
-            for row in tests_df.itertuples(index=False):
+            for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
                 if test_id in test_taken:
                     if course_id not in tests_list:
                         tests_list.append(course_id)
 
-            curr_student = loaded_student[item_index]
+            curr_student = Json.loaded_student[item_index]
             courses = []
             #Adding totalAverage and courses keys into json
-            for i in range(len(loaded_courses)):
-                loaded_courses[i]['courseAverage' : ]
-                if loaded_courses[i]['id'] in tests_list:
-                    courses.append(loaded_courses[i])
+            for i in range(len(Json.loaded_courses)):
+                if Json.loaded_courses[i]['id'] in tests_list:
+                    courses.append(Json.loaded_courses[i])
                     curr_student.update({'totalAverage' : 0,'courses' : courses})
                 course_index+=1
             item_index+=1
@@ -101,7 +57,7 @@ def main():
     get_courses_and_tests()
 
     report = {
-        'students' : loaded_student,
+        'students' : Json.loaded_student,
         'error' : 'Invalid course weights'
     }
 
