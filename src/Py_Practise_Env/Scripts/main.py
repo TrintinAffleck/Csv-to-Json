@@ -20,9 +20,10 @@ def main():
             test_id,curr_student,mark = row
             student_test_id_map.update({f"{curr_student}": values})
             #Clear our lists because we dont want a previous students tests to overlap with the current students tests.
+            #Didn't use .clear() because it overlaps with the next student if there is one.
             if curr_student not in seen_student_ids:
-                values.clear()
-                marks.clear()
+                values = []
+                marks = []
                 seen_student_ids.add(curr_student)
             #Create Marks list to keep track of student marks.
             marks.append(mark)
