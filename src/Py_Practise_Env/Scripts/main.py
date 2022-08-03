@@ -35,16 +35,21 @@ def main():
                 values.append(test_id)
         return student_test_id_map
 
-    #TODO Maybe refactor this too    
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
         for item in create_dict().items():
             student,test_taken = item
             tests_list = []
+            total_weight = 0
             for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
                 if test_id in test_taken:
                     if course_id not in tests_list:
                         tests_list.append(course_id)
+                        total_weight += weight
+                        #Weight cant possibly be higher than 100 percent. So we throw an error key
+                        if weight > 100:
+                            report.update({'error' : 'Invalid course weights'})
+
 
             curr_student = Json.loaded_student[item_index]
             courses = []
@@ -52,16 +57,13 @@ def main():
             for i in range(len(Json.loaded_courses)):
                 if Json.loaded_courses[i]['id'] in tests_list:
                     courses.append(Json.loaded_courses[i])
-                    curr_student.update({'totalAverage' : 0,'courses' : courses})
+                    curr_student.update({'totalAverage' : round(student_marks[student],2),'courses' : courses})
                 course_index+=1
             item_index+=1
             course_index=0
     get_courses_and_tests()
 
-    report = {
-        'students' : Json.loaded_student,
-        'error' : 'Invalid course weights'
-    }
+    report = {'students' : Json.loaded_student}
 
     dumped = dumps(report,indent=2)
     #print(dumped)
