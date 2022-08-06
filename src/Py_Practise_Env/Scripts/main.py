@@ -1,13 +1,14 @@
 #Built-Ins
-from json import loads,dumps
+'''Some of these are in other files'''
+from json import dumps
 
 #Locals
-from command_inputs import Commands as paths
 from data import Data
 from convert import Json
 def main():
     student_test_id_map = {}
     student_marks = {}
+    invalid = False #For invalid course weights
     def create_dict(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
@@ -36,35 +37,41 @@ def main():
         return student_test_id_map
 
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
+        courses_dict = {}
         for item in create_dict().items():
-            student,test_taken = item
-            tests_list = []
             total_weight = 0
+            student,test_taken = item
+            courses_taken = []
             for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
                 if test_id in test_taken:
-                    if course_id not in tests_list:
-                        tests_list.append(course_id)
-                        total_weight += weight
-                        #Weight cant possibly be higher than 100 percent. So we throw an error key
-                        if weight > 100:
-                            report.update({'error' : 'Invalid course weights'})
-
+                    #Reset the total weight to 0 whenever we see a new course so the course weights dont overlap.
+                    if course_id not in courses_taken:
+                        courses_taken.append(course_id)
+                        total_weight = 0
+                    total_weight += weight
+                        
+            #Weight cant possibly be higher than 100 percent. So we throw an error key
+            if total_weight > 100:
+                print("Weights over 100")
+                invalid = True 
 
             curr_student = Json.loaded_student[item_index]
             courses = []
             #Adding totalAverage and courses keys into json
             for i in range(len(Json.loaded_courses)):
-                if Json.loaded_courses[i]['id'] in tests_list:
+                if Json.loaded_courses[i]['id'] in courses_taken:
                     courses.append(Json.loaded_courses[i])
                     curr_student.update({'totalAverage' : round(student_marks[student],2),'courses' : courses})
                 course_index+=1
             item_index+=1
             course_index=0
     get_courses_and_tests()
-
-    report = {'students' : Json.loaded_student}
-
+    if invalid == True:
+        report = {'students' : Json.loaded_student,
+                  'error' : 'Invalid course weights'}
+    else:
+        report = {'students' : Json.loaded_student}
     dumped = dumps(report,indent=2)
     #print(dumped)
     f = open('output.txt','w')
