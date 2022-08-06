@@ -8,7 +8,6 @@ from convert import Json
 def main():
     student_test_id_map = {}
     student_marks = {}
-    invalid = False #For invalid course weights
     def create_dict(): 
         '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
         with the ``key`` being the student and the ``value`` being a unique list of all the different
@@ -35,26 +34,28 @@ def main():
             if test_id not in values:
                 values.append(test_id)
         return student_test_id_map
-
+    
     def get_courses_and_tests(item_index: int = 0, course_index: int = 0):
-        courses_dict = {}
+        '''Returns true if weights are not > 100.'''
+        tests_weight_map = {}
         for item in create_dict().items():
             total_weight = 0
             student,test_taken = item
             courses_taken = []
             for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
+                #Keep track of test_id and its corresponding weight so I can use it outside of the for loop.
+                tests_weight_map.update({f"{test_id}": f"{weight}"})
                 if test_id in test_taken:
                     #Reset the total weight to 0 whenever we see a new course so the course weights dont overlap.
                     if course_id not in courses_taken:
                         courses_taken.append(course_id)
                         total_weight = 0
+                    #Weight cant possibly be higher than 100 percent. So we throw an error key
                     total_weight += weight
-                        
-            #Weight cant possibly be higher than 100 percent. So we throw an error key
-            if total_weight > 100:
-                print("Weights over 100")
-                invalid = True 
+                    if total_weight > 100:
+                        print("Weight values are incorrect.")
+                        return True
 
             curr_student = Json.loaded_student[item_index]
             courses = []
@@ -66,10 +67,10 @@ def main():
                 course_index+=1
             item_index+=1
             course_index=0
-    get_courses_and_tests()
-    if invalid == True:
-        report = {'students' : Json.loaded_student,
-                  'error' : 'Invalid course weights'}
+        return False
+
+    if get_courses_and_tests() == True:
+        report = {'error' : 'Invalid course weights'}
     else:
         report = {'students' : Json.loaded_student}
     dumped = dumps(report,indent=2)
