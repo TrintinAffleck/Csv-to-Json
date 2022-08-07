@@ -50,11 +50,14 @@ def main():
                     #Reset the total weight to 0 whenever we see a new course so the course weights dont overlap.
                     if course_id not in courses_taken:
                         courses_taken.append(course_id)
+                        if total_weight < 100 and total_weight != 0:
+                            print("Weight error: Course weights are under 100.")
+                            return True
                         total_weight = 0
-                    #Weight cant possibly be higher than 100 percent. So we throw an error key
+                    #Weight cant be higher than 100 percent. So we throw an error key
                     total_weight += weight
                     if total_weight > 100:
-                        print("Weight values are incorrect.")
+                        print("Weight error: Course weights are over 100.")
                         return True
 
             curr_student = Json.loaded_student[item_index]
@@ -69,12 +72,13 @@ def main():
             course_index=0
         return False
 
+    #If we hit one of if statements return the error json.
     if get_courses_and_tests() == True:
         report = {'error' : 'Invalid course weights'}
     else:
         report = {'students' : Json.loaded_student}
+
     dumped = dumps(report,indent=2)
-    #print(dumped)
     f = open('output.txt','w')
     f.write(dumped)
     f.close()
