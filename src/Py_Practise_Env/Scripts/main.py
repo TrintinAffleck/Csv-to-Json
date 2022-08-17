@@ -37,10 +37,10 @@ def main():
             #Create Marks list to keep track of student marks.
             marks.append(mark)
             if len(marks) > 0:
-                average_mark = get_avg(marks)
+                average_mark = Data.marks_df.groupby('student_id').mark.mean().loc[curr_student]
                 if test_id not in test_id_marks_dict.keys():
                     test_id_marks_dict.update({test_id: mark})
-                student_avg_mark_dict.update({f"{curr_student}": average_mark})
+                student_avg_mark_dict.update({f"{curr_student}": round(average_mark,2)})
             #We need a list of test_ids for the dictionary.
             if test_id not in values:
                 values.append(test_id)
@@ -49,15 +49,12 @@ def main():
 
     def update_student(courses_taken:list, courses:list, index:int, average):
         student = Json.loaded_student[index]
-        student_key = str(student.get('id'))
-        new_average = average
+        total_avg = Data.marks_df.groupby('student_id').mark.mean().loc[student.get('id')]
         for course in Json.loaded_courses:
             if course.get('id') in courses_taken:
                 courses.append(course)
-                student.update({'totalAverage' : round(student_avg_mark_dict.get(student_key),2),
-                'courses' : courses,
-                'courseAverage' : new_average})
-                new_average.pop(course.get('id'))
+                student.update({'totalAverage' : round(total_avg,2),
+                                'courses' : courses,})
         return courses
 
     def get_courses_and_tests():
@@ -75,11 +72,13 @@ def main():
             for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
                 if test_id in test_taken:
+                    marks_list.append(test_id_marks_dict.get(test_id))
                     if course_id not in courses_taken:
                         courses_taken.append(course_id)
                         course_avg = get_avg(marks_list)
-                        #TODO Problem here is the first row is giving an average of 0 because the marks list is empty
-                        
+                        print(f"average = {course_avg}")
+                        print(f"marks list = {marks_list}")
+                        #TODO use pandas df methods to do this its too hard brute forcing with for loops.
                         course_id_averages_dict.update({course_id : course_avg})
                         marks_list = []
 
@@ -88,9 +87,6 @@ def main():
                             print("Weight error: Course weights are under 100.")
                             return True
                         total_weight = 0
-                    marks_list.append(test_id_marks_dict.get(test_id))
-                    print(f"average = {course_avg}")
-                    print(f"marks list = {marks_list}")
                     total_weight += weight
                     #Weight cant be higher than 100 percent. So we throw an error key.
                     if total_weight > 100:
