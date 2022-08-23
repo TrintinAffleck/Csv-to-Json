@@ -6,6 +6,9 @@ from json import dumps
 from data import Data
 from convert import Json
 
+#3rd Party
+import pandas as pd
+
 #Global variables
 student_test_id_dict = {}
 student_avg_mark_dict = {}
@@ -19,12 +22,9 @@ def main():
         return 0
 
     def get_student_tests(): 
-        '''Gets the Test Ids from the ``marks.csv`` and returns a ``dictionary``
-        with the ``key`` being the student and the ``value`` being a unique list of all the different
-        tests they took. ``E.g:`` if the student with a student id of '1' took tests with test ids 1,1,2,3
-        the value is [1,2,3]'''
         seen_student_ids = set()
         values = []
+
         for row in Data.marks_df.itertuples(index=False):
             test_id,curr_student,mark = row
             student_test_id_dict.update({f"{curr_student}": values})
@@ -46,15 +46,15 @@ def main():
                 values.append(test_id)
         return student_test_id_dict
     
-
-    def update_student(courses_taken:list, courses:list, index:int, average):
+    def update_student(courses_taken:list, courses:list, index:int,averages):
         student = Json.loaded_student[index]
         total_avg = Data.marks_df.groupby('student_id').mark.mean().loc[student.get('id')]
         for course in Json.loaded_courses:
             if course.get('id') in courses_taken:
                 courses.append(course)
                 student.update({'totalAverage' : round(total_avg,2),
-                                'courses' : courses,})
+                                'courses' : courses})
+                course.update({'courseAverage' : averages[course['id']]})
         return courses
 
     def get_courses_and_tests():
@@ -64,40 +64,33 @@ def main():
             student,test_taken = students
             total_weight = 0
             courses_taken = []
+            courses_avg_dict = {}
             course_avg = 0.0
             courses = []
-            course_id_averages_dict = {}
             marks_list = []
 
             for row in Data.tests_df.itertuples(index=False):
                 test_id,course_id,weight = row
                 if test_id in test_taken:
-                    marks_list.append(test_id_marks_dict.get(test_id))
                     if course_id not in courses_taken:
+                        courses_avg_dict[course_id] = 0
                         courses_taken.append(course_id)
-                        course_avg = get_avg(marks_list)
-                        print(f"average = {course_avg}")
-                        print(f"marks list = {marks_list}")
-                        #TODO use pandas df methods to do this its too hard brute forcing with for loops.
-                        course_id_averages_dict.update({course_id : course_avg})
                         marks_list = []
-
                         #Weight cant be lower than 100 percent. So we throw an error key.
                         if total_weight < 100 and total_weight != 0:
                             print("Weight error: Course weights are under 100.")
                             return True
                         total_weight = 0
+                    marks_list.append(test_id_marks_dict.get(test_id))
+                    course_avg = get_avg(marks_list)
+                    courses_avg_dict.update({course_id : course_avg})
                     total_weight += weight
                     #Weight cant be higher than 100 percent. So we throw an error key.
                     if total_weight > 100:
                         print("Weight error: Course weights are over 100.")
                         return True
-            update_student(courses_taken,courses,student_index,course_id_averages_dict)
+            update_student(courses_taken,courses,student_index,courses_avg_dict)
             student_index+=1
-
-            # for course in update_student(courses_taken,courses):
-            #     if course.get('id') in course_averages_dict.keys():
-            #         course.update({'courseAverage' : round(course_averages_dict.get(course['id'],2))})
 
         return False
     if get_courses_and_tests() == True:
