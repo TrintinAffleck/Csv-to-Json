@@ -7,7 +7,6 @@ from data import Data
 from convert import Json
 
 #3rd Party
-import pandas as pd
 
 #Global variables
 student_test_id_dict = {}
@@ -46,9 +45,14 @@ def main():
                 values.append(test_id)
         return student_test_id_dict
     
-    def update_student(courses_taken:list, courses:list, index:int,averages):
-        student = Json.loaded_student[index]
-        total_avg = Data.marks_df.groupby('student_id').mark.mean().loc[student.get('id')]
+    def update_student_keys(courses_taken:list, 
+                            courses:list, 
+                            index:int,
+                            averages
+                            ):
+        student = Json.loaded_student[index-1]
+        df = Data.marks_df
+        total_avg = df.groupby('student_id').mark.mean().loc[student.get('id')]
         for course in Json.loaded_courses:
             if course.get('id') in courses_taken:
                 courses.append(course)
@@ -60,39 +64,43 @@ def main():
     def get_courses_and_tests():
         '''Returns true if weights are not 100.'''
         student_index = 0
-        for students in get_student_tests().items():
-            student,test_taken = students
-            total_weight = 0
-            courses_taken = []
-            courses_avg_dict = {}
-            course_avg = 0.0
-            courses = []
-            marks_list = []
-
-            for row in Data.tests_df.itertuples(index=False):
-                test_id,course_id,weight = row
-                if test_id in test_taken:
-                    if course_id not in courses_taken:
-                        courses_avg_dict[course_id] = 0
-                        courses_taken.append(course_id)
-                        marks_list = []
-                        #Weight cant be lower than 100 percent. So we throw an error key.
-                        if total_weight < 100 and total_weight != 0:
-                            print("Weight error: Course weights are under 100.")
-                            return True
-                        total_weight = 0
-                    marks_list.append(test_id_marks_dict.get(test_id))
-                    course_avg = get_avg(marks_list)
-                    courses_avg_dict.update({course_id : course_avg})
-                    total_weight += weight
-                    #Weight cant be higher than 100 percent. So we throw an error key.
-                    if total_weight > 100:
-                        print("Weight error: Course weights are over 100.")
+        total_weight = 0
+        courses_taken = []
+        courses_avg_dict = {}
+        course_avg = 0.0
+        courses = []
+        marks_list = []
+        for row in Data.tests_df.itertuples(index=False):
+            test_id,course_id,weight = row
+            if test_id in tests_taken:
+                #TODO Problem is if student skips the a test and the next one taken is in not a new course the total weight is not reset
+                if course_id not in courses_taken:
+                    courses_taken.append(course_id)
+                    marks_list = []
+                    #Weight cant be lower than 100 percent. So we throw an error key.
+                    if total_weight < 100 and total_weight != 0:
+                        print("Weight error: Course weights are under 100.")
                         return True
-            update_student(courses_taken,courses,student_index,courses_avg_dict)
+                    total_weight = 0
+                marks_list.append(test_id_marks_dict.get(test_id))
+                course_avg = get_avg(marks_list)
+                courses_avg_dict.update({course_id : course_avg})
+                total_weight += weight
+                #Weight cant be higher than 100 percent. So we throw an error key.
+                if total_weight > 100:
+                    print("Weight error: Course weights are over 100.")
+                    return True
+
+        for student in range(len(Data.students_df.groupby('id'))):
             student_index+=1
+            create_dicts(student_index)
+            update_student_keys(courses_taken,courses,student_index,courses_avg_dict)
+            #Clearing variables for the new student
+            test_id_marks_dict.clear()
+            tests_taken.clear()
 
         return False
+
     if get_courses_and_tests() == True:
         report = {'error' : 'Invalid course weights'}
     else:
