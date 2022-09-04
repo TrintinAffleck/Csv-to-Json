@@ -13,6 +13,9 @@ student_test_id_dict = {}
 student_avg_mark_dict = {}
 test_id_marks_dict = {}
 marks = []
+tests_taken = []
+seen_student = set()
+
 def main():
 
     def get_avg(numbers: list):
@@ -20,45 +23,37 @@ def main():
             return round((sum(numbers) / len(numbers)),2)
         return 0
 
-    def get_student_tests(): 
-        seen_student_ids = set()
-        values = []
-
-        for row in Data.marks_df.itertuples(index=False):
+    def create_dicts(student_index:int): 
+        student_df = Data.marks_df.groupby('student_id').get_group(student_index)
+        for row in student_df.itertuples(index=False):
             test_id,curr_student,mark = row
-            student_test_id_dict.update({f"{curr_student}": values})
-            #Clear our lists because we dont want a previous students tests to overlap with the current students tests.
-            #Didn't use .clear() because it overlaps with the next student if there is one.
-            if curr_student not in seen_student_ids:
-                values = []
-                marks = []
-                seen_student_ids.add(curr_student)
-            #Create Marks list to keep track of student marks.
+            if test_id not in tests_taken:
+                tests_taken.append(test_id)
             marks.append(mark)
             if len(marks) > 0:
-                average_mark = Data.marks_df.groupby('student_id').mark.mean().loc[curr_student]
+                average_mark = get_avg(marks)
+                student_avg_mark_dict.update({f"{curr_student}": round(average_mark,2)})
                 if test_id not in test_id_marks_dict.keys():
                     test_id_marks_dict.update({test_id: mark})
-                student_avg_mark_dict.update({f"{curr_student}": round(average_mark,2)})
-            #We need a list of test_ids for the dictionary.
-            if test_id not in values:
-                values.append(test_id)
-        return student_test_id_dict
-    
+        if student_index not in seen_student:
+            seen_student.add(student_index)
+        return student_test_id_dict 
+
     def update_student_keys(courses_taken:list, 
                             courses:list, 
                             index:int,
                             averages
                             ):
+
         student = Json.loaded_student[index-1]
         df = Data.marks_df
         total_avg = df.groupby('student_id').mark.mean().loc[student.get('id')]
         for course in Json.loaded_courses:
             if course.get('id') in courses_taken:
                 courses.append(course)
+                course.update({'courseAverage' : averages[course['id']]})
                 student.update({'totalAverage' : round(total_avg,2),
                                 'courses' : courses})
-                course.update({'courseAverage' : averages[course['id']]})
         return courses
 
     def get_courses_and_tests():
@@ -70,10 +65,10 @@ def main():
         course_avg = 0.0
         courses = []
         marks_list = []
+
         for row in Data.tests_df.itertuples(index=False):
             test_id,course_id,weight = row
             if test_id in tests_taken:
-                #TODO Problem is if student skips the a test and the next one taken is in not a new course the total weight is not reset
                 if course_id not in courses_taken:
                     courses_taken.append(course_id)
                     marks_list = []
