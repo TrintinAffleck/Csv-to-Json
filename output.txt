@@ -8,17 +8,20 @@
         {
           "id": 1,
           "name": "Biology",
-          "teacher": "Mr. D"
+          "teacher": "Mr. D",
+          "courseAverage": 86.67
         },
         {
           "id": 2,
           "name": "History",
-          "teacher": " Mrs. P"
+          "teacher": " Mrs. P",
+          "courseAverage": 48.5
         },
         {
           "id": 3,
           "name": "Math",
-          "teacher": " Mrs. C"
+          "teacher": " Mrs. C",
+          "courseAverage": 59.0
         }
       ]
     },
@@ -30,12 +33,14 @@
         {
           "id": 1,
           "name": "Biology",
-          "teacher": "Mr. D"
+          "teacher": "Mr. D",
+          "courseAverage": 86.67
         },
         {
           "id": 3,
           "name": "Math",
-          "teacher": " Mrs. C"
+          "teacher": " Mrs. C",
+          "courseAverage": 59.0
         }
       ]
     },
@@ -47,17 +52,20 @@
         {
           "id": 1,
           "name": "Biology",
-          "teacher": "Mr. D"
+          "teacher": "Mr. D",
+          "courseAverage": 86.67
         },
         {
           "id": 2,
           "name": "History",
-          "teacher": " Mrs. P"
+          "teacher": " Mrs. P",
+          "courseAverage": 48.5
         },
         {
           "id": 3,
           "name": "Math",
-          "teacher": " Mrs. C"
+          "teacher": " Mrs. C",
+          "courseAverage": 59.0
         }
       ]
     }

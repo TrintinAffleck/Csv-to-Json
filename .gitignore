@@ -167,3 +167,4 @@ src/Py_Practise_Env/Scripts/Example1/students.csv
 src/Py_Practise_Env/Scripts/Example1/tests.csv
 Csv-to-Json.code-workspace
 .gitignore
+output.txt
