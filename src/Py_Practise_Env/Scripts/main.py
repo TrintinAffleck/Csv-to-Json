@@ -79,7 +79,7 @@ def main():
                 course.update({'courseAverage' : averages[course['id']]})
                 student.update({'totalAverage' : round(total_avg,2),'courses' : courses})
         return courses
-        
+
     def get_courses():
         for row in Data.tests_df.itertuples(index=False):
             test_id,course_id,weight = row
@@ -97,7 +97,7 @@ def main():
         get_courses()
         if error_check(courses_taken,tests_taken) == True:
             break
-        update_student_keys(courses_taken,courses,student_index,courses_avg_dict)
+        update_student_keys(courses_taken,[],student_index,courses_avg_dict)
         #Clearing variables for the next student
         courses.clear()
         courses_avg_dict.clear()
