@@ -11,7 +11,6 @@ from convert import Json
 #Global variables
 student_test_id_dict = {}
 student_avg_mark_dict = {}
-
 seen_student = set()
 test_id_marks_dict = {}
 tests_taken = []        
@@ -112,6 +111,6 @@ if __name__ == '__main__':
         report = {'students' : Json.loaded_student}
 
     dumped = dumps(report,indent=2)
-    f = open('output.txt','w')
+    f = open('output.json','w')
     f.write(dumped)
     f.close()
